@@ -1,6 +1,9 @@
 import requests
+import base64
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 import applemusicpy
 
 app = Flask(__name__)
@@ -64,6 +67,63 @@ def get_playlists():
             print(response.status_code)
             return jsonify({'error': 'Unable to fetch playlists'})
     except Exception as e:
+        return jsonify({'error': str(e)})
+
+
+@app.route('/get_playlists_spotify', methods=['POST'])
+def get_playlists_spotify():
+    try:
+        # Get the current user's playlists
+        received_data = request.get_json()
+        spotify_id_token = received_data.get("auth_key")
+
+        client_id = "6f053b82d7e849729baf10f496acae07"
+        client_secret = "388cf96519ee44c2a3882c9b9315b7cf"
+
+        encoded_credentials = base64.b64encode(client_id.encode() + b':' + client_secret.encode()).decode("utf-8")
+
+        token_headers = {
+            "Authorization": "Basic " + encoded_credentials,
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+
+        token_data = {
+            "grant_type": "authorization_code",
+            "code": spotify_id_token,
+            "redirect_uri": "http://localhost:8000/" # remember to change this when moving to prod
+        }
+
+        r = requests.post("https://accounts.spotify.com/api/token", data=token_data, headers=token_headers)
+        print(r.json())
+        token = r.json()["access_token"]
+        print(token)
+
+        user_headers = {
+            "Authorization": "Bearer " + token,
+            "Content-Type": "application/json"
+        }
+
+        user_params = {
+            "limit": 50
+        }
+
+        user_playlists_response = requests.get("https://api.spotify.com/v1/me/playlists", params=user_params,headers=user_headers)
+        print(user_playlists_response.json())
+
+        # Format the playlists
+        formatted_playlists = []
+        for playlist in user_playlists_response.json()['items']:
+            print("Playlist ID: " + playlist['id'] + " Name: " + playlist['name'])
+            playlist_id = playlist['id']
+            playlist_name = playlist['name']
+            formatted_playlists.append({
+                'id': playlist_id,
+                'name': playlist_name
+            })
+
+        return jsonify(formatted_playlists)
+
+    except spotipy.SpotifyException as e:
         return jsonify({'error': str(e)})
 
 
