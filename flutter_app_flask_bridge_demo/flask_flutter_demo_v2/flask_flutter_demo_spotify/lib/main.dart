@@ -49,9 +49,9 @@ void readSpotifyPlaylistJSON() {
   List<Map<String, String>> decodedPlaylists = customDecode(jsonString);
 }
 
-Future<void> authenticateSpotify() async {
-  final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://localhost:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
-}
+// Future<void> authenticateSpotify() async {
+//   final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://localhost:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
+// }
 
 void main() {
   // runApp(const MyApp());
@@ -77,17 +77,6 @@ class MyApp extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    // // js.context.callMethod("spotifyAuthUser");
-                    // final currentUrl = Uri.base;
-
-                    // // Check if the 'code' parameter exists
-                    // if (currentUrl.queryParameters.containsKey('code')) {
-                    //   final code = currentUrl.queryParameters['code'];
-                    //   print('Received code: $code'); // Print to debug console
-                    //   js.context.callMethod('spotifyAuthUser', [code]);
-                    // } else {
-                    //   authenticateSpotify();
-                    // }
                     js.context.callMethod('spotifyAuthUser');
                   },
                   child: const Text("Authenticate spotify"),
@@ -101,7 +90,6 @@ class MyApp extends StatelessWidget {
                       print('Received code: $code'); // Print to debug console
                       js.context.callMethod('spotifyPlaylistGet', [code]);
                     }
-                    // js.context.callMethod('spotifyPlaylistGet', []);
                   },
                   child: const Text("Retrieve playlist data"),
                 ),
