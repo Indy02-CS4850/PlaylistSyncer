@@ -65,9 +65,9 @@ Future<void> authenticateSpotify() async {
 void dropdownPlaylists(List<String> buttonOrder) {
     String platform = buttonOrder.first;
     if(platform == 'Spotify'){
-      //decodedPlaylists = readSpotifyPlaylistJSON();
+      decodedPlaylists = readSpotifyPlaylistJSON();
       // Done because I didn't want to run into issues whilst testing
-      decodedPlaylists = readApplePlaylistJSON();
+      // decodedPlaylists = readApplePlaylistJSON();
     }
     else if(platform == 'Apple Music'){
       decodedPlaylists = readApplePlaylistJSON();
