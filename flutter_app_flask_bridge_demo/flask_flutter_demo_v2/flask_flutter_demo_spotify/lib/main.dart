@@ -77,24 +77,31 @@ class MyApp extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    // js.context.callMethod("spotifyAuthUser");
-                    final currentUrl = Uri.base;
+                    // // js.context.callMethod("spotifyAuthUser");
+                    // final currentUrl = Uri.base;
 
-                    // Check if the 'code' parameter exists
-                    if (currentUrl.queryParameters.containsKey('code')) {
-                      final code = currentUrl.queryParameters['code'];
-                      print('Received code: $code'); // Print to debug console
-                      js.context.callMethod('spotifyAuthUser', [code]);
-                    } else {
-                      authenticateSpotify();
-                    }
+                    // // Check if the 'code' parameter exists
+                    // if (currentUrl.queryParameters.containsKey('code')) {
+                    //   final code = currentUrl.queryParameters['code'];
+                    //   print('Received code: $code'); // Print to debug console
+                    //   js.context.callMethod('spotifyAuthUser', [code]);
+                    // } else {
+                    //   authenticateSpotify();
+                    // }
+                    js.context.callMethod('spotifyAuthUser');
                   },
                   child: const Text("Authenticate spotify"),
                 ),
                 SizedBox(height: 16), // Add some spacing between buttons
                 ElevatedButton(
                   onPressed: () {
-                    js.context.callMethod('spotifyPlaylistGet');
+                    final currentUrl = Uri.base;
+                    if (currentUrl.queryParameters.containsKey('code')) {
+                      final code = currentUrl.queryParameters['code'];
+                      print('Received code: $code'); // Print to debug console
+                      js.context.callMethod('spotifyPlaylistGet', [code]);
+                    }
+                    // js.context.callMethod('spotifyPlaylistGet', []);
                   },
                   child: const Text("Retrieve playlist data"),
                 ),
