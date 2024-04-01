@@ -62,9 +62,7 @@ window.spotifyAccessTokenGet = function(userToken) {
     })
       .then(response => response.json())
       .then(data => {
-        // pain = JSON.stringify(data)
-        console.log(toString(data))
-        window.spotifyPlaylistState.access_token = pain;
+        window.spotifyPlaylistState.access_token = data.access_token;
       })
       .catch(error => {
         console.error("Error sending auth key:" + toString(error));

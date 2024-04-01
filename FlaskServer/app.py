@@ -1,3 +1,5 @@
+import json
+
 import requests
 import base64
 from flask import Flask, request, jsonify
@@ -8,6 +10,7 @@ import applemusicpy
 
 app = Flask(__name__)
 CORS(app)
+
 
 # dev_token = "eyJhbGciOiJFUzI1NiIsImlzcyI6IlE2VEdZNUQ3TTIiLCJraWQiOiI2QlREQzdUTEJWIiwidHlwIjoiSldUIn0.eyJpc3MiOiI2OWE2ZGU5NS0wMjNmLTQ3ZTMtZTA1My0xMmxqbGVpbzNrYWp2emJ2IiwiaWF0IjoxNzExNzAwODgxLCJleHAiOjE3MTE3MDIwMjEsImF1ZCI6ImFwcHN0b3JlY29ubmVjdC12MSJ9.l3McweqdZ_EGV50vZue__cYVrZtyMB1rchbV4lUHFd_4BnTqUoLP0Qy9U_PmNdCncFeQQnfq-oj2QXS5RAQZHQ"
 def get_user_playlists(user_apple_id_token):
@@ -67,6 +70,7 @@ def get_playlists():
     except Exception as e:
         return jsonify({'error': str(e)})
 
+
 @app.route('/get_access_token_spotify', methods=['POST'])
 def get_access_token_spotify():
     received_data = request.get_json()
@@ -92,8 +96,7 @@ def get_access_token_spotify():
     print(r.json())
     token = r.json()["access_token"]
     print(token)
-    # the error is here
-    return jsonify(token)
+    return jsonify({"access_token": token})
 
 
 @app.route('/get_playlists_spotify', methods=['POST'])
@@ -177,8 +180,9 @@ def create_playlists_apple_music_to_spotify():
         'Authorization': "Bearer " + dev_token,
         'Music-User-Token': apple_id_token
     }
-    apple_response = requests.get("https://api.music.apple.com/v1/me/library/playlists/{}/tracks".format(apple_playlist_id),
-                                  headers=headers)
+    apple_response = requests.get(
+        "https://api.music.apple.com/v1/me/library/playlists/{}/tracks".format(apple_playlist_id),
+        headers=headers)
 
     songs = []
     if apple_response.status_code == 200:
@@ -202,7 +206,7 @@ def create_playlists_apple_music_to_spotify():
     # Get the current user's playlists
 
     playlist_data = {
-        "name": "test playlist",
+        "name": apple_playlist_name,
         "public": True  # Set to True for a public playlist, False for private
     }
 
@@ -213,7 +217,34 @@ def create_playlists_apple_music_to_spotify():
     }
 
     response = requests.post(create_playlist_url, json=playlist_data, headers=headers)
-    print(response)
+    new_playlist_id = response.json()['id']
+    print(new_playlist_id)
+    for song in songs:
+        try:
+            song_search = song['track_name']
+            song_artist = song['artist_name']
+            search_query = f'{song_search} {song_artist}'
+            print(search_query)
+            search_url = f'https://api.spotify.com/v1/search?q={search_query}&type=track&limit=3'
+            headers = {
+                'Authorization': f'Bearer {spotify_id_token}',
+                'Content-Type': 'application/json',
+            }
+            response = requests.get(search_url, headers=headers)
+            found_song = response.json()['tracks']['items'][0]
+            print(f"Track: {found_song['name']} by {found_song['artists'][0]['name']} by {found_song['uri']}")
+
+            add_to_playlist_url = f'https://api.spotify.com/v1/playlists/{new_playlist_id}/tracks'
+            track_uris = {"uris": [f'spotify:track:{found_song["id"]}'], "position": 0}
+            response = requests.post(add_to_playlist_url, headers=headers, json=track_uris)
+            if response.status_code == 200:
+                print(f"Song with URI {found_song['id']} added to the playlist!")
+            else:
+                print(f"Error adding song to the playlist. Status code: {response.status_code}")
+
+        except Exception as e:
+            print("Failed to search")
+            return jsonify({'error': str(e)})
 
     return {}
 
