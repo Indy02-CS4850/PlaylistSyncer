@@ -53,7 +53,7 @@ window.spotifyAuthUser = function() {
 // }
 
 window.spotifyAccessTokenGet = function(userToken) {
-  fetch("http://127.0.0.1:5000/get_access_token_spotify", {
+  fetch("http://99.8.194.131:5000/get_access_token_spotify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -70,7 +70,7 @@ window.spotifyAccessTokenGet = function(userToken) {
 }
 
 window.spotifyPlaylistGet = function(access_token) {
-  fetch("http://127.0.0.1:5000/get_playlists_spotify", {
+  fetch("http://99.8.194.131:5000/get_playlists_spotify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

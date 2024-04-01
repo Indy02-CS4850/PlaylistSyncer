@@ -28,7 +28,7 @@ window.applePlaylistState = {};
 
 //get playlist data then if valid update window.state and call the dart function to read the data
 window.applePlaylistGet = function() {
-    fetch("http://127.0.0.1:5000/get_playlists", {
+    fetch("http://99.8.194.131:5000/get_playlists", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

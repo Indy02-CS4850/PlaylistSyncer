@@ -1,5 +1,5 @@
 window.createPlaylistfromAppleMusicToSpotify = function(apple_id_token,apple_playlist_id,apple_playlist_name,spotify_auth_key) {
-    fetch("http://127.0.0.1:5000/create_playlists_apple_music_to_spotify", {
+    fetch("http://99.8.194.131:5000/create_playlists_apple_music_to_spotify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
