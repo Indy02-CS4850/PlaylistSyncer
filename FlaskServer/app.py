@@ -89,7 +89,7 @@ def get_access_token_spotify():
     token_data = {
         "grant_type": "authorization_code",
         "code": spotify_id_token,
-        "redirect_uri": "http://localhost:8000/"  # remember to change this when moving to prod
+        "redirect_uri": "http://99.8.194.131:8000/"  # remember to change this when moving to prod
     }
 
     r = requests.post("https://accounts.spotify.com/api/token", data=token_data, headers=token_headers)
@@ -120,7 +120,7 @@ def get_playlists_spotify():
         # token_data = {
         #     "grant_type": "authorization_code",
         #     "code": spotify_id_token,
-        #     "redirect_uri": "http://localhost:8000/"  # remember to change this when moving to prod
+        #     "redirect_uri": "http://99.8.194.131:8000/"  # remember to change this when moving to prod
         # }
         #
         # r = requests.post("https://accounts.spotify.com/api/token", data=token_data, headers=token_headers)

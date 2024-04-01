@@ -59,7 +59,7 @@ List<Map<String, String>> readSpotifyPlaylistJSON() { // This gets called in js
 } // Returns a list of playlist IDs and Names
 
 Future<void> authenticateSpotify() async {
-  final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://localhost:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
+  final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://99.8.194.131:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
 }
 
 void dropdownPlaylists(List<String> buttonOrder) {
@@ -171,16 +171,16 @@ class MyApp extends StatelessWidget {
                               },
                               child: const Text("Retrieve playlist data"),
                             ),
-                            ElevatedButton(
-                              onPressed: () {
-                                var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
-                                String appleIDString = appleState['Apple_ID_Token'];
-                                var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
-                                String spotifyIDString = spotifyState['access_token'];
-                                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,"p.mDxCgx0Bz3","Firewatch",spotifyIDString]); // this is an example playlist
-                              },
-                              child: const Text("test Playlist transfer"),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () {
+                            //     var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
+                            //     String appleIDString = appleState['Apple_ID_Token'];
+                            //     var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
+                            //     String spotifyIDString = spotifyState['access_token'];
+                            //     js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,"p.mDxCgx0Bz3","Firewatch",spotifyIDString]); // this is an example playlist
+                            //   },
+                            //   child: const Text("test Playlist transfer"),
+                            // ),
                           ],
                         ),
                       ),
@@ -323,6 +323,16 @@ class _TransferProcessState extends State<TransferProcess> with SingleTickerProv
               print(playlist_name); // Testing purposes
               String platformFrom = buttonOrder.first;
               print(platformFrom); // Testing purposes
+
+              if(platformFrom == "Apple Music"){
+                var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
+                String appleIDString = appleState['Apple_ID_Token'];
+                var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
+                String spotifyIDString = spotifyState['access_token'];
+                int index = decodedPlaylists.indexWhere((map) => map['name'] == playlist_name);
+                print(index);
+                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+              }
               // Start a method here that takes these both and sends them to flask for the
               // get playlist data, sync, and create playlist. For now just assume that 
               // whatever platform was pressed first is transferring to the other option

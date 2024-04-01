@@ -15,7 +15,7 @@ window.spotifyPlaylistState = {};
 
 const client_id = '6f053b82d7e849729baf10f496acae07';
 const client_secret = '388cf96519ee44c2a3882c9b9315b7cf';
-const redirect_uri = 'http://localhost:8000/'; // Your callback URL
+const redirect_uri = 'http://99.8.194.131:8000/'; // Your callback URL
 // var userToken = "";
 
 // Step 1: Redirect the user to Spotify's authorization page
