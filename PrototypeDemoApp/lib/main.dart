@@ -130,20 +130,30 @@ class MyApp extends StatelessWidget {
                             ElevatedButton(
                               onPressed: () async {
                                 // js.context.callMethod("spotifyAuthUser");
-                                js.context.callMethod('spotifyAuthUser');
+                                // js.context.callMethod('spotifyAuthUser');
+                                final currentUrl = Uri.base;
+                                if(currentUrl.queryParameters.containsKey('code')){
+                                  final code = currentUrl.queryParameters['code'];
+                                  print('Recieved code: $code');
+                                  js.context.callMethod('spotifyAccessTokenGet', [code]);
+                                }else{
+                                  js.context.callMethod('spotifyAuthUser');
+                                }
                               },
                               child: const Text("Authenticate spotify"),
                             ),
                             const SizedBox(height: 16), // Add some spacing between buttons
                             ElevatedButton(
                               onPressed: () {
-                                final currentUrl = Uri.base;
-                                if(currentUrl.queryParameters.containsKey('code')){
-                                  final code = currentUrl.queryParameters['code'];
-                                  print('Recieved code: $code');
-                                  js.context.callMethod('spotifyPlaylistGet', [code]);
-                                }
-                                //js.context.callMethod('spotifyPlaylistGet');
+                                // final currentUrl = Uri.base;
+                                // if(currentUrl.queryParameters.containsKey('code')){
+                                //   final code = currentUrl.queryParameters['code'];
+                                //   print('Recieved code: $code');
+                                //   js.context.callMethod('spotifyPlaylistGet', [code]);
+                                // }
+                                var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
+                                String spotifyIDString = spotifyState['access_token'];
+                                js.context.callMethod('spotifyPlaylistGet', [spotifyIDString]);
                               },
                               child: const Text("Retrieve playlist data"),
                             ),
@@ -160,6 +170,16 @@ class MyApp extends StatelessWidget {
                                 js.context.callMethod('applePlaylistGet');
                               },
                               child: const Text("Retrieve playlist data"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
+                                String appleIDString = appleState['Apple_ID_Token'];
+                                var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
+                                String spotifyIDString = spotifyState['access_token'];
+                                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,"p.mDxCgx0Bz3","Firewatch",spotifyIDString]); // this is an example playlist
+                              },
+                              child: const Text("test Playlist transfer"),
                             ),
                           ],
                         ),

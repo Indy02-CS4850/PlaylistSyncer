@@ -20,7 +20,7 @@ const redirect_uri = 'http://localhost:8000/'; // Your callback URL
 
 // Step 1: Redirect the user to Spotify's authorization page
 window.spotifyAuthUser = function() {
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative`;
+    const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=playlist-modify-private user-library-read playlist-modify-public playlist-read-private playlist-read-collaborative`;
     window.location.href = authUrl;
 }
 
@@ -52,14 +52,32 @@ window.spotifyAuthUser = function() {
 //   }
 // }
 
-window.spotifyPlaylistGet = function(userToken) {
-  console.log(userToken);
-  fetch("http://127.0.0.1:5000/get_playlists_spotify", {
+window.spotifyAccessTokenGet = function(userToken) {
+  fetch("http://127.0.0.1:5000/get_access_token_spotify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ "auth_key": userToken })
+    })
+      .then(response => response.json())
+      .then(data => {
+        // pain = JSON.stringify(data)
+        console.log(toString(data))
+        window.spotifyPlaylistState.access_token = pain;
+      })
+      .catch(error => {
+        console.error("Error sending auth key:" + toString(error));
+      });
+}
+
+window.spotifyPlaylistGet = function(access_token) {
+  fetch("http://127.0.0.1:5000/get_playlists_spotify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ "auth_key": access_token })
     })
       .then(response => response.json())
       .then(data => {

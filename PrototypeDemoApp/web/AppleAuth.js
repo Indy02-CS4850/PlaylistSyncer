@@ -18,6 +18,7 @@ function appleAuthUser() {
         console.log("authorized");
         // console.log("token is: " + token);
         userToken = token;
+        window.applePlaylistState.Apple_ID_Token = userToken;
         console.log("token is: " + userToken)
     });
 }
