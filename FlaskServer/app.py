@@ -249,5 +249,89 @@ def create_playlists_apple_music_to_spotify():
     return {}
 
 
+@app.route('/create_playlists_spotify_to_apple_music', methods=['POST'])
+def create_playlists_spotify_to_apple_music():
+    received_data = request.get_json()
+    print(f"Received message: {received_data}")
+    apple_id_token = received_data.get("apple_id_token")
+    print(f"Received message: {apple_id_token}")
+    spotify_playlist_id = received_data.get("spotify_playlist_id")
+    print(f"Received message: {spotify_playlist_id}")
+    spotify_playlist_name = received_data.get("spotify_playlist_name")
+    print(f"Received message: {spotify_playlist_name}")
+    spotify_id_token = received_data.get("spotify_auth_key")
+    print(f"Received message: {spotify_id_token}")
+
+    # 1. query apple music for playlist
+    dev_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ"
+
+    # Make a GET request to MusicKit API
+    apple_headers = {
+        'Authorization': "Bearer " + dev_token,
+        'Music-User-Token': apple_id_token,
+        'Content-Type': 'application/json'
+    }
+
+    # query spotify for playlist
+    songs = []
+
+    spotify_playlist_url = "https://api.spotify.com/v1/me/playlists/{}/tracks".format(spotify_playlist_id)
+    spotify_headers = {
+        "Authorization": f"Bearer {spotify_id_token}",
+        "Content-Type": "application/json"
+    }
+
+    spotify_playlist_get_response = requests.get(spotify_playlist_url, headers=spotify_headers)
+    spotify_playlist_get_response_json = spotify_playlist_get_response.json()
+
+    # add all songs in playlist to list
+    if spotify_playlist_get_response.status_code == 200:
+        # Loop through each song in the playlist
+        for item in spotify_playlist_get_response_json['items']:
+            # Get the song name and artist
+            song_name = item['track']['name']
+            song_artist = item['track']['artists'][0]['name']
+            songs.append((song_name, song_artist))
+    else:
+        print("Failed to get playlist: ", spotify_playlist_get_response_json)
+
+    apple_songs = []
+    apple_search_headers = {
+        'Authorization': f'Bearer {dev_token}',
+    }
+
+    # find and add all songs
+    for song in songs:
+        # The song name goes here
+        song_name = song[0] + " " + song[1]
+        response = requests.get(f'https://api.music.apple.com/v1/catalog/us/songs?filter[term]={song_name}',
+                                headers=apple_search_headers)
+        response_json = response.json()
+        # Check if the request was successful
+        if response.status_code == 200:
+            # Check if 'results' is not empty and contains an 'id' field
+            if response_json.get('results') and 'id' in response_json['results'][0]:
+                # Loop through each song in the response
+                apple_songs.append(response_json['results'][0]['id'])
+            else:
+                print("Failed to get song ID: ", response_json)
+        else:
+            print("Failed to get songs: ", response_json)
+
+    # The playlist details go here
+    playlist_details = {
+        "attributes": {
+            "name": spotify_playlist_name,
+            "description": "Generated Playlist from Spotify",
+            "tracks": apple_songs
+        }
+    }
+
+    apple_response = requests.post('https://api.music.apple.com/v1/me/library/playlists', headers=apple_headers,
+                                   data=json.dumps(playlist_details))
+    print(apple_response.status_code)
+    return {}
+
+
 if __name__ == '__main__':
     app.run(debug=True)
