@@ -324,14 +324,17 @@ class _TransferProcessState extends State<TransferProcess> with SingleTickerProv
               String platformFrom = buttonOrder.first;
               print(platformFrom); // Testing purposes
 
-              if(platformFrom == "Apple Music"){
-                var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
+               var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
                 String appleIDString = appleState['Apple_ID_Token'];
                 var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
                 String spotifyIDString = spotifyState['access_token'];
                 int index = decodedPlaylists.indexWhere((map) => map['name'] == playlist_name);
                 print(index);
+
+              if(platformFrom == "Apple Music"){
                 js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+              } else if (platformFrom == "Spotify"){
+                js.context.callMethod('createPlaylistfromSpotifyToAppleMusic', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
               }
               // Start a method here that takes these both and sends them to flask for the
               // get playlist data, sync, and create playlist. For now just assume that 
