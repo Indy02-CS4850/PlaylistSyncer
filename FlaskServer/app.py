@@ -129,6 +129,16 @@ def get_playlists_spotify():
         # print(token)
         # spToken = token
 
+        # Set up headers and parameters for the request
+        user_headers = {
+            "Authorization": "Bearer " + spotify_id_token,
+            "Content-Type": "application/json"
+        }
+
+        user_params = {
+            "limit": 50
+        }
+
         user_playlists_response = requests.get("https://api.spotify.com/v1/me/playlists", params=user_params,
                                                headers=user_headers)
 
