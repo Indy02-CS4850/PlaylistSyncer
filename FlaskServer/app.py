@@ -107,28 +107,6 @@ def get_playlists_spotify():
         spotify_id_token = received_data.get("auth_key")
         print(spotify_id_token)
 
-        # client_id = "6f053b82d7e849729baf10f496acae07"
-        # client_secret = "388cf96519ee44c2a3882c9b9315b7cf"
-        #
-        # encoded_credentials = base64.b64encode(client_id.encode() + b':' + client_secret.encode()).decode("utf-8")
-        #
-        # token_headers = {
-        #     "Authorization": "Basic " + encoded_credentials,
-        #     "Content-Type": "application/x-www-form-urlencoded"
-        # }
-        #
-        # token_data = {
-        #     "grant_type": "authorization_code",
-        #     "code": spotify_id_token,
-        #     "redirect_uri": "http://99.8.194.131:8000/"  # remember to change this when moving to prod
-        # }
-        #
-        # r = requests.post("https://accounts.spotify.com/api/token", data=token_data, headers=token_headers)
-        # print(r.json())
-        # token = r.json()["access_token"]
-        # print(token)
-        # spToken = token
-
         # Set up headers and parameters for the request
         user_headers = {
             "Authorization": "Bearer " + spotify_id_token,
@@ -148,21 +126,6 @@ def get_playlists_spotify():
             print("Playlist ID: " + playlist['id'] + " Name: " + playlist['name'])
             playlist_id = playlist['id']
             playlist_name = playlist['name']
-
-            # Get the tracks in the playlist
-            playlist_tracks_response = requests.get(f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks",
-                                                    headers=user_headers)
-            playlist_tracks = playlist_tracks_response.json()['items']
-
-            # Format the tracks
-            formatted_tracks = []
-            for track in playlist_tracks:
-                track_name = track['track']['name']
-                track_artist = track['track']['artists'][0]['name']
-                formatted_tracks.append({
-                    'name': track_name,
-                    'artist': track_artist
-                })
 
             # Add the playlist and its tracks to the list
             formatted_playlists.append({
@@ -302,10 +265,10 @@ def create_playlists_spotify_to_apple_music():
         "Content-Type": "application/json"
     }
 
-    spotify_playlist_get_response = requests.get(f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks",
+    spotify_playlist_get_response = requests.get(f"https://api.spotify.com/v1/playlists/{spotify_playlist_id}/tracks",
                                                     headers=user_headers)
     playlist_tracks = spotify_playlist_get_response.json()['items']
-
+    # print(playlist_tracks)
     # Format the tracks
     formatted_tracks = []
     for track in playlist_tracks:
@@ -315,6 +278,8 @@ def create_playlists_spotify_to_apple_music():
             'name': track_name,
             'artist': track_artist
         })
+
+    print(formatted_tracks)
 
     # # add all songs in playlist to list
     # if spotify_playlist_get_response.status_code == 200:
@@ -336,19 +301,17 @@ def create_playlists_spotify_to_apple_music():
     # find and add all songs
     for track in formatted_tracks:
         # The song name goes here
-        song_name = track.get('name') + track.get('artists')
-        response = requests.get(f'https://api.music.apple.com/v1/catalog/us/songs?filter[term]={song_name}',
-                                headers=apple_search_headers)
+        song_name = str(track.get('name')) + " " + str(track.get('artist'))
+        print(song_name)
+        song_name_encoded = requests.utils.quote(song_name)
+        response = requests.get(f'https://api.music.apple.com/v1/catalog/us/search?types=songs&term={song_name_encoded}', headers=apple_search_headers)
         response_json = response.json()
+        #print(response_json)
         # Check if the request was successful
         if response.status_code == 200:
-            # Check if 'results' is not empty and contains an 'id' field
-            if response_json.get('results') and 'id' in response_json['results'][0]:
-                # Loop through each song in the response
-                print("Song found: " + response_json['results'][0]);
-                apple_songs.append(response_json['results'][0]['id'])
-            else:
-                print("Failed to get song ID: ", response_json)
+            song_to_add = response_json['results']['songs']['data'][0]
+            #print(song_to_add)
+            apple_songs.append({"id": song_to_add['id'], "type": "songs"})
         else:
             print("Failed to get songs: ", response_json)
 
@@ -356,14 +319,20 @@ def create_playlists_spotify_to_apple_music():
     playlist_details = {
         "attributes": {
             "name": spotify_playlist_name,
-            "description": "Generated Playlist from Spotify",
-            "tracks": apple_songs
+            "description": "Generated Playlist from Spotify"
+        },
+        "relationships": {
+            "tracks": {
+                "data": apple_songs
+            }
         }
     }
 
+    print(apple_songs)
+
     apple_response = requests.post('https://api.music.apple.com/v1/me/library/playlists', headers=apple_headers,
                                    data=json.dumps(playlist_details))
-    print(apple_response.status_code)
+    print(apple_response)
     return {}
 
 
