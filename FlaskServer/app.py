@@ -11,10 +11,6 @@ import applemusicpy
 app = Flask(__name__)
 CORS(app)
 
-apple_dev_token = ""
-spotify_client_id = ""
-spotify_client_secret = ""
-
 
 @app.route('/get_playlists_apple', methods=['POST'])
 def get_playlists():
@@ -24,11 +20,11 @@ def get_playlists():
         print(f"Received message: {received_data}")
         print(f"Received message: {apple_id_token}")
 
-        dev_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ"
+        apple_dev_token = open("apple_dev_token.txt", "r").read()
 
         # Make a GET request to MusicKit API
         headers = {
-            'Authorization': "Bearer " + dev_token,
+            'Authorization': "Bearer " + apple_dev_token,
             'Music-User-Token': apple_id_token
         }
         response = requests.get("https://api.music.apple.com/v1/me/library/playlists", headers=headers)
@@ -50,10 +46,10 @@ def get_access_token_spotify():
     received_data = request.get_json()
     spotify_id_token = received_data.get("auth_key")
 
-    client_id = "6f053b82d7e849729baf10f496acae07"
-    client_secret = "388cf96519ee44c2a3882c9b9315b7cf"
+    spotify_client_id = open("spotify_client_id.txt", "r").read()
+    spotify_client_secret = open("spotify_client_secret.txt", "r").read()
 
-    encoded_credentials = base64.b64encode(client_id.encode() + b':' + client_secret.encode()).decode("utf-8")
+    encoded_credentials = base64.b64encode(spotify_client_id.encode() + b':' + spotify_client_secret.encode()).decode("utf-8")
 
     token_headers = {
         "Authorization": "Basic " + encoded_credentials,
@@ -131,11 +127,11 @@ def create_playlists_apple_music_to_spotify():
     print(f"Received message: {spotify_id_token}")
 
     # 1. query apple music for playlist
-    dev_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ"
+    apple_dev_token = open("apple_dev_token.txt", "r").read()
 
     # Make a GET request to MusicKit API
     headers = {
-        'Authorization': "Bearer " + dev_token,
+        'Authorization': "Bearer " + apple_dev_token,
         'Music-User-Token': apple_id_token
     }
     apple_response = requests.get(
@@ -221,11 +217,11 @@ def create_playlists_spotify_to_apple_music():
     print(f"Received message: {spotify_id_token}")
 
     # 1. query apple music for playlist
-    dev_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ"
+    apple_dev_token = open("apple_dev_token.txt", "r").read()
 
     # Make a GET request to MusicKit API
     apple_headers = {
-        'Authorization': "Bearer " + dev_token,
+        'Authorization': "Bearer " + apple_dev_token,
         'Music-User-Token': apple_id_token,
         'Content-Type': 'application/json'
     }
@@ -257,7 +253,7 @@ def create_playlists_spotify_to_apple_music():
 
     apple_songs = []
     apple_search_headers = {
-        'Authorization': f'Bearer {dev_token}',
+        'Authorization': f'Bearer {apple_dev_token}',
     }
 
     # find and add all songs
@@ -301,4 +297,5 @@ def create_playlists_spotify_to_apple_music():
 
 
 if __name__ == '__main__':
+
     app.run(debug=True)
