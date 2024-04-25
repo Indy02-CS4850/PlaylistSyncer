@@ -129,18 +129,8 @@ def get_playlists_spotify():
         # print(token)
         # spToken = token
 
-        user_headers = {
-            "Authorization": "Bearer " + spotify_id_token,
-            "Content-Type": "application/json"
-        }
-
-        user_params = {
-            "limit": 50
-        }
-
         user_playlists_response = requests.get("https://api.spotify.com/v1/me/playlists", params=user_params,
                                                headers=user_headers)
-        print(user_playlists_response.json())
 
         # Format the playlists
         formatted_playlists = []
@@ -148,10 +138,31 @@ def get_playlists_spotify():
             print("Playlist ID: " + playlist['id'] + " Name: " + playlist['name'])
             playlist_id = playlist['id']
             playlist_name = playlist['name']
+
+            # Get the tracks in the playlist
+            playlist_tracks_response = requests.get(f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks",
+                                                    headers=user_headers)
+            playlist_tracks = playlist_tracks_response.json()['items']
+
+            # Format the tracks
+            formatted_tracks = []
+            for track in playlist_tracks:
+                track_name = track['track']['name']
+                track_artist = track['track']['artists'][0]['name']
+                formatted_tracks.append({
+                    'name': track_name,
+                    'artist': track_artist
+                })
+
+            # Add the playlist and its tracks to the list
             formatted_playlists.append({
                 'id': playlist_id,
                 'name': playlist_name
             })
+
+            # Print the formatted playlists and their tracks
+            for track in formatted_tracks:
+                print(f"Track Name: {track['name']} Artist: {track['artist']}")
 
         return jsonify(formatted_playlists)
 
@@ -275,7 +286,7 @@ def create_playlists_spotify_to_apple_music():
     # query spotify for playlist
     songs = []
 
-    spotify_playlist_url = "https://api.spotify.com/v1/me/playlists/" + spotify_playlist_id + "/tracks"
+    spotify_playlist_url = f'https://api.spotify.com/v1/playlists/{spotify_playlist_id}/tracks'
     spotify_headers = {
         "Authorization": f"Bearer {spotify_id_token}",
         "Content-Type": "application/json"
