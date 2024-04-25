@@ -275,7 +275,7 @@ def create_playlists_spotify_to_apple_music():
     # query spotify for playlist
     songs = []
 
-    spotify_playlist_url = "https://api.spotify.com/v1/me/playlists/{}/tracks".format(spotify_playlist_id)
+    spotify_playlist_url = "https://api.spotify.com/v1/me/playlists/" + spotify_playlist_id + "/tracks"
     spotify_headers = {
         "Authorization": f"Bearer {spotify_id_token}",
         "Content-Type": "application/json"
@@ -291,6 +291,7 @@ def create_playlists_spotify_to_apple_music():
             # Get the song name and artist
             song_name = item['track']['name']
             song_artist = item['track']['artists'][0]['name']
+            print(f"Song: {song_name} by {song_artist}")
             songs.append((song_name, song_artist))
     else:
         print("Failed to get playlist: ", spotify_playlist_get_response_json)
