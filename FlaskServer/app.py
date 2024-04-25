@@ -11,38 +11,12 @@ import applemusicpy
 app = Flask(__name__)
 CORS(app)
 
-
-# dev_token = "eyJhbGciOiJFUzI1NiIsImlzcyI6IlE2VEdZNUQ3TTIiLCJraWQiOiI2QlREQzdUTEJWIiwidHlwIjoiSldUIn0.eyJpc3MiOiI2OWE2ZGU5NS0wMjNmLTQ3ZTMtZTA1My0xMmxqbGVpbzNrYWp2emJ2IiwiaWF0IjoxNzExNzAwODgxLCJleHAiOjE3MTE3MDIwMjEsImF1ZCI6ImFwcHN0b3JlY29ubmVjdC12MSJ9.l3McweqdZ_EGV50vZue__cYVrZtyMB1rchbV4lUHFd_4BnTqUoLP0Qy9U_PmNdCncFeQQnfq-oj2QXS5RAQZHQ"
-def get_user_playlists(user_apple_id_token):
-    try:
-        # Validate the Apple ID token (you can use pyjwt or any other library)
-        # ...
-        dev_token = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ"
-
-        print(user_apple_id_token)
-        # Make a GET request to MusicKit API
-        headers = {
-            'Authorization': "Bearer " + dev_token,
-            'Music-User-Token': user_apple_id_token
-        }
-        response = requests.get("https://api.music.apple.com/v1/me/library/playlists", headers=headers)
-
-        if response.status_code == 200:
-            playlists_data = response.json().get('data', [])
-            playlists = [{'name': p['attributes']['name'], 'id': p['id']} for p in playlists_data]
-            print(playlists)
-            return playlists
-        elif response.status_code == 401:
-            print("we failed pt 2")
-            return None
-        elif response.status_code == 403:
-            print("we failed")
-            return None
-    except Exception as e:
-        return str(e)
+apple_dev_token = ""
+spotify_client_id = ""
+spotify_client_secret = ""
 
 
-@app.route('/get_playlists', methods=['POST'])
+@app.route('/get_playlists_apple', methods=['POST'])
 def get_playlists():
     try:
         received_data = request.get_json()
@@ -266,7 +240,7 @@ def create_playlists_spotify_to_apple_music():
     }
 
     spotify_playlist_get_response = requests.get(f"https://api.spotify.com/v1/playlists/{spotify_playlist_id}/tracks",
-                                                    headers=user_headers)
+                                                 headers=user_headers)
     playlist_tracks = spotify_playlist_get_response.json()['items']
     # print(playlist_tracks)
     # Format the tracks
@@ -281,18 +255,6 @@ def create_playlists_spotify_to_apple_music():
 
     print(formatted_tracks)
 
-    # # add all songs in playlist to list
-    # if spotify_playlist_get_response.status_code == 200:
-    #     # Loop through each song in the playlist
-    #     for item in spotify_playlist_get_response_json['items']:
-    #         # Get the song name and artist
-    #         song_name = item['track']['name']
-    #         song_artist = item['track']['artists'][0]['name']
-    #         print(f"Song: {song_name} by {song_artist}")
-    #         songs.append((song_name, song_artist))
-    # else:
-    #     print("Failed to get playlist: ", spotify_playlist_get_response_json)
-
     apple_songs = []
     apple_search_headers = {
         'Authorization': f'Bearer {dev_token}',
@@ -304,7 +266,9 @@ def create_playlists_spotify_to_apple_music():
         song_name = str(track.get('name')) + " " + str(track.get('artist'))
         print(song_name)
         song_name_encoded = requests.utils.quote(song_name)
-        response = requests.get(f'https://api.music.apple.com/v1/catalog/us/search?types=songs&term={song_name_encoded}', headers=apple_search_headers)
+        response = requests.get(
+            f'https://api.music.apple.com/v1/catalog/us/search?types=songs&term={song_name_encoded}',
+            headers=apple_search_headers)
         response_json = response.json()
         #print(response_json)
         # Check if the request was successful
