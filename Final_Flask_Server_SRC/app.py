@@ -11,7 +11,7 @@ import applemusicpy
 app = Flask(__name__)
 CORS(app)
 
-spotify_redirect_uri = "http://99.8.194.131:8000/"
+spotify_redirect_uri = ""
 
 # read spotify client id from file
 @app.route('/get_spotify_data', methods=['GET'])

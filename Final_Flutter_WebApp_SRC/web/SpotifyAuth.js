@@ -3,9 +3,9 @@
 // temp datastore for playlists
 window.spotifyPlaylistState = {};
 
-const redirect_uri = 'http://99.8.194.131:8000/'; // Your callback URL for spotify
-let url = "http://99.8.194.131";
-let port = "5000";
+const redirect_uri = ''; // Your callback URL for spotify
+let url = "";
+let port = "";
 
 // Redirect the user to Spotify's authorization page
 window.spotifyAuthUser = function() {

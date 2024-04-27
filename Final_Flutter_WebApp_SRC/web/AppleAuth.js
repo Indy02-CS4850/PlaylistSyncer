@@ -2,8 +2,8 @@
 
 userToken = ""; //gets filledin by user when they login
 // 
-let url = "http://99.8.194.131";
-let port = "5000";
+let url = "";
+let port = "";
 
 // function to authenticate Apple Music Users
 function appleAuthUser() {
