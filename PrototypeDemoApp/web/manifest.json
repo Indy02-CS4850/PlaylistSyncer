@@ -1,11 +1,11 @@
 {
-    "name": "flask_flutter_demo_v3",
-    "short_name": "flask_flutter_demo_v3",
+    "name": "PlaylistSyncer",
+    "short_name": "PlaylistSyncer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A web app to sync playlists between streaming platforms",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
