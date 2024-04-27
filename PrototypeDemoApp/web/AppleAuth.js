@@ -1,10 +1,19 @@
-// web/script.js
-devToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ";
+// web/AppleAuth.js
+
 userToken = ""; //gets filledin by user when they login
 
 // function to authenticate Apple Music Users
 function appleAuthUser() {
-    MusicKit.configure({
+    devToken = ""
+
+    fetch("http://99.8.194.131:5000/get_apple_data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(response => response.json()).then(data => {
+      devToken = data.apple_dev_token;
+      MusicKit.configure({
         developerToken: devToken,
         app: {
             name: "OurApp",
@@ -15,12 +24,10 @@ function appleAuthUser() {
     let music = MusicKit.getInstance();
 
     music.authorize().then((token) => {
-        console.log("authorized");
-        // console.log("token is: " + token);
         userToken = token;
         window.applePlaylistState.Apple_ID_Token = userToken;
-        console.log("token is: " + userToken)
     });
+    })
 }
 
 // temp datastore for playlists
@@ -28,7 +35,7 @@ window.applePlaylistState = {};
 
 //get playlist data then if valid update window.state and call the dart function to read the data
 window.applePlaylistGet = function() {
-    fetch("http://99.8.194.131:5000/get_playlists", {
+    fetch("http://99.8.194.131:5000/get_playlists_apple", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -37,9 +44,8 @@ window.applePlaylistGet = function() {
     })
       .then(response => response.json())
       .then(data => {
-        pain = JSON.stringify(data)
-        window.applePlaylistState.Playlists = pain;
-        console.log("Received data from Flask: " + pain);
+        playlist = JSON.stringify(data)
+        window.applePlaylistState.Playlists = playlist;
         readApplePlaylistJSON();
       })
       .catch(error => {

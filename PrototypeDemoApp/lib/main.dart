@@ -1,13 +1,6 @@
-import 'dart:convert' as convert;
 import 'dart:developer';
-import 'dart:html';
-import 'dart:js_interop';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:js' as js;
-import 'package:spotify_sdk/spotify_sdk.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 // don't ask why flutters decoder for json doesnt work.
 List<Map<String, String>> customDecode(String jsonString) { // This is what gets the playlist names/ids
@@ -32,19 +25,12 @@ List<Map<String, String>> customDecode(String jsonString) { // This is what gets
     Map<String, String> playlist = {'id': id, 'name': name};
     playlists.add(playlist);
   }
-
-  // Print playlist names and IDs
-  for (var playlist in playlists) {
-    print('Playlist ID: ${playlist['id']}, Name: ${playlist['name']}');
-  }
-
   return playlists;
 }
 
 List<Map<String, String>> readApplePlaylistJSON() { // This gets called in js
   var state = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
   String jsonString = state['Playlists'];
-
   List<Map<String, String>> applePlaylists = customDecode(jsonString);
   return applePlaylists;
 } // Returns a list of playlist IDs and Names
@@ -52,22 +38,14 @@ List<Map<String, String>> readApplePlaylistJSON() { // This gets called in js
 List<Map<String, String>> readSpotifyPlaylistJSON() { // This gets called in js
   var state = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
   String jsonString = state['Playlists'];
-  log(jsonString);
-
   List<Map<String, String>> spotifyPlaylists = customDecode(jsonString);
   return spotifyPlaylists;
 } // Returns a list of playlist IDs and Names
-
-Future<void> authenticateSpotify() async {
-  final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://99.8.194.131:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
-}
 
 void dropdownPlaylists(List<String> buttonOrder) {
     String platform = buttonOrder.first;
     if(platform == 'Spotify'){
       decodedPlaylists = readSpotifyPlaylistJSON();
-      // Done because I didn't want to run into issues whilst testing
-      // decodedPlaylists = readApplePlaylistJSON();
     }
     else if(platform == 'Apple Music'){
       decodedPlaylists = readApplePlaylistJSON();
@@ -79,13 +57,14 @@ List<Map<String, String>> decodedPlaylists = [];
 
 
 void main() {
-  // runApp(const MyApp());
   js.context['readApplePlaylistJSON'] = js.allowInterop(readApplePlaylistJSON);
   js.context['readSpotifyPlaylistJSON'] = js.allowInterop(readSpotifyPlaylistJSON);
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
     @override
     Widget build(BuildContext context) {
         return MaterialApp(
@@ -122,40 +101,32 @@ class MyApp extends StatelessWidget {
                 body: TabBarView(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                // js.context.callMethod("spotifyAuthUser");
-                                // js.context.callMethod('spotifyAuthUser');
                                 final currentUrl = Uri.base;
+                                //if code received in url call access token generation, else redirect to spotify login
                                 if(currentUrl.queryParameters.containsKey('code')){
                                   final code = currentUrl.queryParameters['code'];
-                                  print('Recieved code: $code');
                                   js.context.callMethod('spotifyAccessTokenGet', [code]);
                                 }else{
                                   js.context.callMethod('spotifyAuthUser');
                                 }
                               },
-                              child: const Text("Authenticate spotify"),
+                              child: const Text("Authenticate Spotify"),
                             ),
                             const SizedBox(height: 16), // Add some spacing between buttons
                             ElevatedButton(
                               onPressed: () {
-                                // final currentUrl = Uri.base;
-                                // if(currentUrl.queryParameters.containsKey('code')){
-                                //   final code = currentUrl.queryParameters['code'];
-                                //   print('Recieved code: $code');
-                                //   js.context.callMethod('spotifyPlaylistGet', [code]);
-                                // }
                                 var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
                                 String spotifyIDString = spotifyState['access_token'];
                                 js.context.callMethod('spotifyPlaylistGet', [spotifyIDString]);
                               },
-                              child: const Text("Retrieve playlist data"),
+                              child: const Text("Retrieve Spotify Playlist Data"),
                             ),
                             const SizedBox(height: 16), // Add some spacing between buttons
                             ElevatedButton(
@@ -169,24 +140,14 @@ class MyApp extends StatelessWidget {
                               onPressed: () {
                                 js.context.callMethod('applePlaylistGet');
                               },
-                              child: const Text("Retrieve playlist data"),
+                              child: const Text("Retrieve Apple Music Playlist Data"),
                             ),
-                            // ElevatedButton(
-                            //   onPressed: () {
-                            //     var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
-                            //     String appleIDString = appleState['Apple_ID_Token'];
-                            //     var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
-                            //     String spotifyIDString = spotifyState['access_token'];
-                            //     js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,"p.mDxCgx0Bz3","Firewatch",spotifyIDString]); // this is an example playlist
-                            //   },
-                            //   child: const Text("test Playlist transfer"),
-                            // ),
                           ],
                         ),
                       ),
                     ),
-                    Center(child: TransferProcess()), // This is what is on each page
-                    Center(child: Text('Plans to change theme here')), // This is what is on each page
+                    const Center(child: TransferProcess()), // This is what is on each page
+                    const Center(child: Text('Plans to change theme here')), // This is what is on each page
                 ],
               ),
             ),
@@ -196,6 +157,8 @@ class MyApp extends StatelessWidget {
 }
 
 class TransferProcess extends StatefulWidget {
+  const TransferProcess({super.key});
+
   @override
   _TransferProcessState createState() => _TransferProcessState();
 }
@@ -319,28 +282,24 @@ class _TransferProcessState extends State<TransferProcess> with SingleTickerProv
           alignment: Alignment.bottomRight,
           child: ElevatedButton(
             onPressed: () {
-              String playlist_name = getSelectedPlaylist();
-              print(playlist_name); // Testing purposes
+              String playlistName = getSelectedPlaylist();
               String platformFrom = buttonOrder.first;
-              print(platformFrom); // Testing purposes
 
+              //grab apple and spotify ids
                var appleState = js.JsObject.fromBrowserObject(js.context['applePlaylistState']);
                 String appleIDString = appleState['Apple_ID_Token'];
                 var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
                 String spotifyIDString = spotifyState['access_token'];
-                int index = decodedPlaylists.indexWhere((map) => map['name'] == playlist_name);
-                print(index);
-
+                //find playlist id by finding index of selected item in dropdown menu
+                int index = decodedPlaylists.indexWhere((map) => map['name'] == playlistName);
+                //start playlist transfer
               if(platformFrom == "Apple Music"){
-                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlistName,spotifyIDString]);
               } else if (platformFrom == "Spotify"){
-                js.context.callMethod('createPlaylistfromSpotifyToAppleMusic', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+                js.context.callMethod('createPlaylistfromSpotifyToAppleMusic', [appleIDString,decodedPlaylists[index]['id'],playlistName,spotifyIDString]);
               }
-              // Start a method here that takes these both and sends them to flask for the
-              // get playlist data, sync, and create playlist. For now just assume that 
-              // whatever platform was pressed first is transferring to the other option
             },
-            child: Text("Start Transfer"),
+            child: const Text("Start Transfer"),
           ),
         ),
               ],
