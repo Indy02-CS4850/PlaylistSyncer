@@ -3,13 +3,15 @@
 // temp datastore for playlists
 window.spotifyPlaylistState = {};
 
-const redirect_uri = 'http://99.8.194.131:8000/'; // Your callback URL
+const redirect_uri = 'http://99.8.194.131:8000/'; // Your callback URL for spotify
+let url = "http://99.8.194.131";
+let port = "5000";
 
 // Redirect the user to Spotify's authorization page
 window.spotifyAuthUser = function() {
     client_id = ""
     //fetch client if from flask server and use it to access spoitfy services
-    fetch("http://99.8.194.131:5000/get_spotify_data", {
+    fetch(`${url}:${port}/get_spotify_data`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -23,7 +25,7 @@ window.spotifyAuthUser = function() {
 
 // generate a user access token on the flask server based on user token
 window.spotifyAccessTokenGet = function(userToken) {
-  fetch("http://99.8.194.131:5000/get_access_token_spotify", {
+  fetch(`${url}:${port}/get_access_token_spotify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -41,7 +43,7 @@ window.spotifyAccessTokenGet = function(userToken) {
 
 //get playlist data then if valid update window.state and call the dart function to read the data
 window.spotifyPlaylistGet = function(access_token) {
-  fetch("http://99.8.194.131:5000/get_playlists_spotify", {
+  fetch(`${url}:${port}/get_playlists_spotify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

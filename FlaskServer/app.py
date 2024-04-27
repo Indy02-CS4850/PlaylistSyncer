@@ -11,6 +11,8 @@ import applemusicpy
 app = Flask(__name__)
 CORS(app)
 
+spotify_redirect_uri = "http://99.8.194.131:8000/"
+
 # read spotify client id from file
 @app.route('/get_spotify_data', methods=['GET'])
 def get_spotify_data():
@@ -70,7 +72,7 @@ def get_access_token_spotify():
     token_data = {
         "grant_type": "authorization_code",
         "code": spotify_id_token,
-        "redirect_uri": "http://99.8.194.131:8000/"  # remember to change this when moving to prod
+        "redirect_uri": spotify_redirect_uri
     }
 
     # get token from spotify and send back to flutter js

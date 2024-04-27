@@ -1,5 +1,8 @@
+let url = "http://99.8.194.131";
+let port = "5000";
+
 window.createPlaylistfromAppleMusicToSpotify = function(apple_id_token,apple_playlist_id,apple_playlist_name,spotify_auth_key) {
-    fetch("http://99.8.194.131:5000/create_playlists_apple_music_to_spotify", {
+    fetch(`${url}:${port}/create_playlists_apple_music_to_spotify`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -15,7 +18,7 @@ window.createPlaylistfromAppleMusicToSpotify = function(apple_id_token,apple_pla
 }
 
 window.createPlaylistfromSpotifyToAppleMusic = function(apple_id_token,spotify_playlist_id,spotify_playlist_name,spotify_auth_key) {
-  fetch("http://99.8.194.131:5000/create_playlists_spotify_to_apple_music", {
+  fetch(`${url}:${port}/create_playlists_spotify_to_apple_music`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
