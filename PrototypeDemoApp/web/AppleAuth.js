@@ -1,5 +1,5 @@
-// web/script.js
-//devToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ";
+// web/AppleAuth.js
+
 userToken = ""; //gets filledin by user when they login
 
 // function to authenticate Apple Music Users
@@ -24,31 +24,10 @@ function appleAuthUser() {
     let music = MusicKit.getInstance();
 
     music.authorize().then((token) => {
-        console.log("authorized");
-        // console.log("token is: " + token);
         userToken = token;
         window.applePlaylistState.Apple_ID_Token = userToken;
-        console.log("token is: " + userToken)
     });
     })
-
-    // MusicKit.configure({
-    //     developerToken: devToken,
-    //     app: {
-    //         name: "OurApp",
-    //         build: "1.0"
-    //     }
-    // });
-
-    // let music = MusicKit.getInstance();
-
-    // music.authorize().then((token) => {
-    //     console.log("authorized");
-    //     // console.log("token is: " + token);
-    //     userToken = token;
-    //     window.applePlaylistState.Apple_ID_Token = userToken;
-    //     console.log("token is: " + userToken)
-    // });
 }
 
 // temp datastore for playlists
@@ -65,9 +44,8 @@ window.applePlaylistGet = function() {
     })
       .then(response => response.json())
       .then(data => {
-        pain = JSON.stringify(data)
-        window.applePlaylistState.Playlists = pain;
-        console.log("Received data from Flask: " + pain);
+        playlist = JSON.stringify(data)
+        window.applePlaylistState.Playlists = playlist;
         readApplePlaylistJSON();
       })
       .catch(error => {
