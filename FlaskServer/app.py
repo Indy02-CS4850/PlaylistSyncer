@@ -113,8 +113,8 @@ def get_playlists_spotify():
             })
 
             # Print the formatted playlists and their tracks
-            for track in formatted_tracks:
-                print(f"Track Name: {track['name']} Artist: {track['artist']}")
+            # for track in formatted_tracks:
+            #     print(f"Track Name: {track['name']} Artist: {track['artist']}")
 
         return jsonify(formatted_playlists)
 

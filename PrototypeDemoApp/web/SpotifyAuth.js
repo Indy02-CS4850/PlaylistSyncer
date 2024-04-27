@@ -25,10 +25,12 @@ window.spotifyAuthUser = function() {
       }
     }).then(response => response.json()).then(data => {
       client_id = data.spotify_client_id;
+      const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=playlist-modify-private user-library-read playlist-modify-public playlist-read-private playlist-read-collaborative`;
+      window.location.href = authUrl;
     })
 
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=playlist-modify-private user-library-read playlist-modify-public playlist-read-private playlist-read-collaborative`;
-    window.location.href = authUrl;
+    // const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=playlist-modify-private user-library-read playlist-modify-public playlist-read-private playlist-read-collaborative`;
+    // window.location.href = authUrl;
 }
 
 // window.spotifyGetCodeFromURL = function() {

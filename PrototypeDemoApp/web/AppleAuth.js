@@ -13,9 +13,7 @@ function appleAuthUser() {
       }
     }).then(response => response.json()).then(data => {
       devToken = data.apple_dev_token;
-    })
-
-    MusicKit.configure({
+      MusicKit.configure({
         developerToken: devToken,
         app: {
             name: "OurApp",
@@ -32,6 +30,25 @@ function appleAuthUser() {
         window.applePlaylistState.Apple_ID_Token = userToken;
         console.log("token is: " + userToken)
     });
+    })
+
+    // MusicKit.configure({
+    //     developerToken: devToken,
+    //     app: {
+    //         name: "OurApp",
+    //         build: "1.0"
+    //     }
+    // });
+
+    // let music = MusicKit.getInstance();
+
+    // music.authorize().then((token) => {
+    //     console.log("authorized");
+    //     // console.log("token is: " + token);
+    //     userToken = token;
+    //     window.applePlaylistState.Apple_ID_Token = userToken;
+    //     console.log("token is: " + userToken)
+    // });
 }
 
 // temp datastore for playlists

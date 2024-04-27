@@ -1,13 +1,6 @@
-import 'dart:convert' as convert;
 import 'dart:developer';
-import 'dart:html';
-import 'dart:js_interop';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:js' as js;
-import 'package:spotify_sdk/spotify_sdk.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 // don't ask why flutters decoder for json doesnt work.
 List<Map<String, String>> customDecode(String jsonString) { // This is what gets the playlist names/ids
@@ -82,10 +75,12 @@ void main() {
   // runApp(const MyApp());
   js.context['readApplePlaylistJSON'] = js.allowInterop(readApplePlaylistJSON);
   js.context['readSpotifyPlaylistJSON'] = js.allowInterop(readSpotifyPlaylistJSON);
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
     @override
     Widget build(BuildContext context) {
         return MaterialApp(
@@ -122,7 +117,7 @@ class MyApp extends StatelessWidget {
                 body: TabBarView(
                   children: [
                     Container(
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -185,8 +180,8 @@ class MyApp extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Center(child: TransferProcess()), // This is what is on each page
-                    Center(child: Text('Plans to change theme here')), // This is what is on each page
+                    const Center(child: TransferProcess()), // This is what is on each page
+                    const Center(child: Text('Plans to change theme here')), // This is what is on each page
                 ],
               ),
             ),
@@ -196,6 +191,8 @@ class MyApp extends StatelessWidget {
 }
 
 class TransferProcess extends StatefulWidget {
+  const TransferProcess({super.key});
+
   @override
   _TransferProcessState createState() => _TransferProcessState();
 }
@@ -319,8 +316,8 @@ class _TransferProcessState extends State<TransferProcess> with SingleTickerProv
           alignment: Alignment.bottomRight,
           child: ElevatedButton(
             onPressed: () {
-              String playlist_name = getSelectedPlaylist();
-              print(playlist_name); // Testing purposes
+              String playlistName = getSelectedPlaylist();
+              print(playlistName); // Testing purposes
               String platformFrom = buttonOrder.first;
               print(platformFrom); // Testing purposes
 
@@ -328,19 +325,19 @@ class _TransferProcessState extends State<TransferProcess> with SingleTickerProv
                 String appleIDString = appleState['Apple_ID_Token'];
                 var spotifyState = js.JsObject.fromBrowserObject(js.context['spotifyPlaylistState']);
                 String spotifyIDString = spotifyState['access_token'];
-                int index = decodedPlaylists.indexWhere((map) => map['name'] == playlist_name);
+                int index = decodedPlaylists.indexWhere((map) => map['name'] == playlistName);
                 print(index);
 
               if(platformFrom == "Apple Music"){
-                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+                js.context.callMethod('createPlaylistfromAppleMusicToSpotify', [appleIDString,decodedPlaylists[index]['id'],playlistName,spotifyIDString]);
               } else if (platformFrom == "Spotify"){
-                js.context.callMethod('createPlaylistfromSpotifyToAppleMusic', [appleIDString,decodedPlaylists[index]['id'],playlist_name,spotifyIDString]);
+                js.context.callMethod('createPlaylistfromSpotifyToAppleMusic', [appleIDString,decodedPlaylists[index]['id'],playlistName,spotifyIDString]);
               }
               // Start a method here that takes these both and sends them to flask for the
               // get playlist data, sync, and create playlist. For now just assume that 
               // whatever platform was pressed first is transferring to the other option
             },
-            child: Text("Start Transfer"),
+            child: const Text("Start Transfer"),
           ),
         ),
               ],
