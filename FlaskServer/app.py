@@ -11,6 +11,15 @@ import applemusicpy
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/get_spotify_data', methods=['GET'])
+def get_spotify_data():
+    spotify_client_id = open("spotify_client_id.txt", "r").read()
+    return jsonify({"spotify_client_id": spotify_client_id})
+
+@app.route('/get_apple_data', methods=['GET'])
+def get_apple_data():
+    apple_dev_token = open("apple_dev_token.txt", "r").read()
+    return jsonify({"apple_dev_token": apple_dev_token})
 
 @app.route('/get_playlists_apple', methods=['POST'])
 def get_playlists():

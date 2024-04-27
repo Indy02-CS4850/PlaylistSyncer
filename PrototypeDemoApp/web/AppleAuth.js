@@ -1,9 +1,20 @@
 // web/script.js
-devToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ";
+//devToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlE2VEdZNUQ3TTIifQ.eyJpYXQiOjE3MTE1MzI0MjUsImV4cCI6MTcyNzA4NDQyNSwiaXNzIjoiNkJUREM3VExCViJ9.jpq9oDEOCDiv9CiZKLkU8jfD8lLxUvooeI2fcat4hHlMr9nOv69jYhuAMNzimB4fHXGUFKOO0Mxtjv_SaFCQeQ";
 userToken = ""; //gets filledin by user when they login
 
 // function to authenticate Apple Music Users
 function appleAuthUser() {
+    devToken = ""
+
+    fetch("http://99.8.194.131:5000/get_apple_data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(response => response.json()).then(data => {
+      devToken = data.apple_dev_token;
+    })
+
     MusicKit.configure({
         developerToken: devToken,
         app: {

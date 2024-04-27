@@ -1,8 +1,4 @@
 // // web/script.js
-// const clientId = '6f053b82d7e849729baf10f496acae07';
-// const clientSecret = '388cf96519ee44c2a3882c9b9315b7cf';
-// const redirectUri = 'http://localhost:53519/'; //change this on push to prod
-// const scopes = ['user-read-private', 'user-read-email'];
 
 // temp datastore for playlists
 window.spotifyPlaylistState = {};
@@ -13,13 +9,24 @@ window.spotifyPlaylistState = {};
 //     userToken = spotifyUserToken;
 // }
 
-const client_id = '6f053b82d7e849729baf10f496acae07';
-const client_secret = '388cf96519ee44c2a3882c9b9315b7cf';
+// const client_id = '6f053b82d7e849729baf10f496acae07';
+// const client_secret = '388cf96519ee44c2a3882c9b9315b7cf';
 const redirect_uri = 'http://99.8.194.131:8000/'; // Your callback URL
 // var userToken = "";
 
 // Step 1: Redirect the user to Spotify's authorization page
 window.spotifyAuthUser = function() {
+    client_id = ""
+
+    fetch("http://99.8.194.131:5000/get_spotify_data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(response => response.json()).then(data => {
+      client_id = data.spotify_client_id;
+    })
+
     const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=code&redirect_uri=${encodeURIComponent(redirect_uri)}&scope=playlist-modify-private user-library-read playlist-modify-public playlist-read-private playlist-read-collaborative`;
     window.location.href = authUrl;
 }

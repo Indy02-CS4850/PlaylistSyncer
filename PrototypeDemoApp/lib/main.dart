@@ -58,9 +58,9 @@ List<Map<String, String>> readSpotifyPlaylistJSON() { // This gets called in js
   return spotifyPlaylists;
 } // Returns a list of playlist IDs and Names
 
-Future<void> authenticateSpotify() async {
-  final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://99.8.194.131:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
-}
+// Future<void> authenticateSpotify() async {
+//   final result = await FlutterWebAuth.authenticate(url: "https://accounts.spotify.com/authorize?client_id=6f053b82d7e849729baf10f496acae07&redirect_uri=http://99.8.194.131:8000/&scope=user-library-read playlist-modify-private playlist-modify-public playlist-read-private playlist-read-collaborative&response_type=code", callbackUrlScheme: "my-custom-app");
+// }
 
 void dropdownPlaylists(List<String> buttonOrder) {
     String platform = buttonOrder.first;
@@ -155,7 +155,7 @@ class MyApp extends StatelessWidget {
                                 String spotifyIDString = spotifyState['access_token'];
                                 js.context.callMethod('spotifyPlaylistGet', [spotifyIDString]);
                               },
-                              child: const Text("Retrieve playlist data"),
+                              child: const Text("Retrieve Spotify playlist data"),
                             ),
                             const SizedBox(height: 16), // Add some spacing between buttons
                             ElevatedButton(
@@ -169,7 +169,7 @@ class MyApp extends StatelessWidget {
                               onPressed: () {
                                 js.context.callMethod('applePlaylistGet');
                               },
-                              child: const Text("Retrieve playlist data"),
+                              child: const Text("Retrieve Apple Music playlist data"),
                             ),
                             // ElevatedButton(
                             //   onPressed: () {
