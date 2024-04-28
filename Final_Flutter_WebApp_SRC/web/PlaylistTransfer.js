@@ -1,5 +1,5 @@
-let url = "http://99.8.194.131";
-let port = "5000";
+var url = "http://99.8.194.131";
+var port = "5000";
 
 window.createPlaylistfromAppleMusicToSpotify = function(apple_id_token,apple_playlist_id,apple_playlist_name,spotify_auth_key) {
     fetch(`${url}:${port}/create_playlists_apple_music_to_spotify`, {
