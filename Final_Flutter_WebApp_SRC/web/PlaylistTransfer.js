@@ -1,5 +1,5 @@
-let url = "";
-let port = "";
+var url = "";
+var port = "";
 
 window.createPlaylistfromAppleMusicToSpotify = function(apple_id_token,apple_playlist_id,apple_playlist_name,spotify_auth_key) {
     fetch(`${url}:${port}/create_playlists_apple_music_to_spotify`, {

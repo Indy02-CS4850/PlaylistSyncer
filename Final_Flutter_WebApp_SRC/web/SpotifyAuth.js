@@ -4,8 +4,8 @@
 window.spotifyPlaylistState = {};
 
 const redirect_uri = ''; // Your callback URL for spotify
-let url = "";
-let port = "";
+var url = "";
+var port = "";
 
 // Redirect the user to Spotify's authorization page
 window.spotifyAuthUser = function() {

@@ -2,8 +2,8 @@
 
 userToken = ""; //gets filledin by user when they login
 // 
-let url = "";
-let port = "";
+var url = "";
+var port = "";
 
 // function to authenticate Apple Music Users
 function appleAuthUser() {
